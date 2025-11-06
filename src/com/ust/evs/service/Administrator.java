@@ -1,5 +1,4 @@
 package com.ust.evs.service;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -9,11 +8,11 @@ import com.ust.evs.bean.ElectionBean;
 import com.ust.evs.bean.PartyBean;
 
 public interface Administrator {
-	public String addElection(ElectionBean electionBean) ;
+	public ArrayList<ElectionBean> addElection(ElectionBean electionBean) ;
 	public ArrayList<ElectionBean> viewAllUpcomingElections() ; 
 	public ArrayList<ElectionBean> viewElections();
 	public String addParty(PartyBean partyBean); 
-	public <PartyBean> void viewAllParty() ;
+	public ArrayList<PartyBean> viewAllParty() ;
 	public String addCandidate(CandidateBean candidateBean) ;
 	public ArrayList<CandidateBean> viewCandidateDetailsByElectionName(String electionName) ;
 	public ArrayList<ApplicationBean> viewAllAdminPendingApplications() ;

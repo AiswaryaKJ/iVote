@@ -62,5 +62,12 @@ public class ElectionBean {
 
 	 public void setCountingDate(Date countingDate) {
 		 this.countingDate = countingDate;
+	 }
+
+	 @Override
+	 public String toString() {
+		return "ElectionBean [electionID=" + electionID + ", name=" + name + ", electionDate=" + electionDate
+				+ ", district=" + district + ", constituency=" + constituency + ", countingDate=" + countingDate + "]";
 	 } 
+	 
 }

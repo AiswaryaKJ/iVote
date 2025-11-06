@@ -1,65 +1,94 @@
 package com.ust.evs.ui;
 
 import javax.swing.JOptionPane;
-import com.ust.evs.bean.ElectionBean;
 import com.ust.evs.dao.Admdao;
+import com.ust.evs.dao.ElectoralOfficedao;
+import com.ust.evs.dao.Voterdao;
 import com.ust.evs.service.Administrator;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.ust.evs.service.ElectoralOfficer;
+import com.ust.evs.service.Voter;
 
 public class login {
+
     public static void main(String[] args) {
+
         String userId = JOptionPane.showInputDialog("Enter User ID:");
         String password = JOptionPane.showInputDialog("Enter Password:");
 
         if (userId.equals("ADMIN") && password.equals("ADMIN@123")) {
+
             Administrator admin = new Admdao();
-            boolean running = true;
+            adminMenu(admin);   
 
-            while (running) {
-                String choice = JOptionPane.showInputDialog(
-                		"Choose an option:\n1. Add Election\n2.Remove Election\n3.View Election Details\n4.View All Upcoming Election\n5.Add Party\n6.View Party\n7.View All Pending Request Voterid8.Add Candidate\n9. Exit"
-                );
-
-                switch (choice) {
-                    case "1":
-                        try {
-                            ElectionBean electionBean = new ElectionBean();
-                            electionBean.setElectionID(JOptionPane.showInputDialog("Enter Election ID:"));
-                            electionBean.setName(JOptionPane.showInputDialog("Enter Election Name:"));
-
-                            String electionDateStr = JOptionPane.showInputDialog("Enter Election Date (YYYY-MM-DD):");
-                            String countingDateStr = JOptionPane.showInputDialog("Enter Counting Date (YYYY-MM-DD):");
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            Date electionDate = sdf.parse(electionDateStr);
-                            Date countingDate = sdf.parse(countingDateStr);
-
-                            electionBean.setElectionDate(electionDate);
-                            electionBean.setCountingDate(countingDate);
-                            electionBean.setDistrict(JOptionPane.showInputDialog("Enter District:"));
-                            electionBean.setConstituency(JOptionPane.showInputDialog("Enter Constituency:"));
-                            
-                        } catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, "Invalid date format. Use YYYY-MM-DD.");
-                        }
-                        break;
-                    case "3":
-                    	admin.viewElections(); // 👈 This prints the election list
-                        break;
-                    case "9":
-                        running = false;
-                        JOptionPane.showMessageDialog(null, "Exiting...");
-                        admin.viewElections(); // 👈 This prints the election list
-                        break;
-
-
-                    default:
-                        JOptionPane.showMessageDialog(null, "Invalid choice. Try again.");
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Invalid User ID and Password");
         }
-        
+        else if (userId.equals("EO") && password.equals("EO@123")) {
+
+            ElectoralOfficer eo = new ElectoralOfficedao();
+            eoMenu(eo);   
+
+        }
+        else if (userId.equals("ADMIN") && password.equals("ADMIN@123")) {
+
+            Voter citizen = new Voterdao();
+            VoterMenu(citizen);   
+
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Invalid Login!");
+        }
     }
+
+    public static void adminMenu(Administrator admin) {
+
+        while (true) {
+            String menu = """
+                    Select an option:
+                    
+                    1. Add Election
+                    2. View All Elections
+                    3. View Upcoming Elections
+                    4. Add Party
+                    5. View All Parties
+                    6. Logout
+                    """;
+
+            String choice = JOptionPane.showInputDialog(menu);
+
+            if (choice == null) break; 
+
+            switch (choice) {
+
+                case "1":
+                    admin.addElection(null);
+                    break;
+
+                case "2":
+                    JOptionPane.showMessageDialog(null, admin.viewElections());
+                    break;
+
+                case "3":
+                    admin.viewAllUpcomingElections();
+                    break;
+
+                case "4":
+                    admin.addParty(null);
+                    break;
+
+                case "5":
+                    JOptionPane.showMessageDialog(null, admin.viewAllParty());
+                    break;
+
+                case "6":
+                    JOptionPane.showMessageDialog(null, "Logged Out!");
+                    return;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Invalid choice!");
+            }
+        }
+    }
+    public static void eoMenu(ElectoralOfficer eo) {
+}
+    public static void VoterMenu(Voter citizen) {
+}
 }

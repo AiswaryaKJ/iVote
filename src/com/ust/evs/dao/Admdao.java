@@ -26,31 +26,14 @@ public class Admdao implements Administrator {
     public ArrayList<ElectionBean> addElection(ElectionBean electionBean) {
 
         try {
-            ElectionBean eb = new ElectionBean();
-
-            eb.setElectionID(JOptionPane.showInputDialog("Enter Election ID:"));
-            eb.setName(JOptionPane.showInputDialog("Enter Election Name:"));
-
-            String electionDateStr = JOptionPane.showInputDialog("Enter Election Date (YYYY-MM-DD):");
-            String countingDateStr = JOptionPane.showInputDialog("Enter Counting Date (YYYY-MM-DD):");
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date electionDate = sdf.parse(electionDateStr);
-            Date countingDate = sdf.parse(countingDateStr);
-
-            eb.setElectionDate(electionDate);
-            eb.setCountingDate(countingDate);
-            eb.setDistrict(JOptionPane.showInputDialog("Enter District:"));
-            eb.setConstituency(JOptionPane.showInputDialog("Enter Constituency:"));
-
-            electionArray.add(eb);
+            electionArray.add(electionBean);
 
             JOptionPane.showMessageDialog(null, "Election Added Successfully!");
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Invalid Date Format! Use YYYY-MM-DD.");
+            JOptionPane.showMessageDialog(null, "Failed!!");
         }
-        return electionArray;
+        return null;
     }
 
    
@@ -91,7 +74,7 @@ public class Admdao implements Administrator {
     @Override
     public String addParty(PartyBean partyBean) {
 
-        PartyBean pb = new PartyBean();
+        PartyBean pb = new PartyBean(null, null, null, null);
         pb.setPartyID(JOptionPane.showInputDialog("Enter Party ID:"));
         pb.setName(JOptionPane.showInputDialog("Enter Party Name:"));
         pb.setLeader(JOptionPane.showInputDialog("Enter Party Leader:"));
@@ -124,7 +107,7 @@ public class Admdao implements Administrator {
     @Override
     public String addCandidate(CandidateBean candidateBean) {
 
-        CandidateBean cb = new CandidateBean();
+        CandidateBean cb = new CandidateBean(null, null, null, null, null, null, null, null, null, null);
 
         cb.setCandidateID(JOptionPane.showInputDialog("Enter Candidate ID:"));
         cb.setName(JOptionPane.showInputDialog("Enter Candidate Name:"));

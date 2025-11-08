@@ -12,6 +12,17 @@ public class ApplicationBean {
 	     
 	 private String voterID;
 
+	 
+
+	 public ApplicationBean(String userID, String constituency, int passedStatus, int approvedStatus, String voterID) {
+		super();
+		this.userID = userID;
+		this.constituency = constituency;
+		this.passedStatus = passedStatus;
+		this.approvedStatus = approvedStatus;
+		this.voterID = voterID;
+	}
+
 	 public String getUserID() {
 		 return userID;
 	 }

@@ -9,6 +9,14 @@ public class PartyBean {
 	     
 	 private String symbol;
 
+	 public PartyBean(String partyID, String name, String leader, String symbol) {
+		super();
+		this.partyID = partyID;
+		this.name = name;
+		this.leader = leader;
+		this.symbol = symbol;
+	}
+
 	 public String getPartyID() {
 		 return partyID;
 	 }

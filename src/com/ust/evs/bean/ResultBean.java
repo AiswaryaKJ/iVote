@@ -10,6 +10,14 @@ public class ResultBean {
 	         
 	private int voteCount ;
 
+	public ResultBean(int serialNo, String electionID, String candidateID, int voteCount) {
+		super();
+		this.serialNo = serialNo;
+		this.electionID = electionID;
+		this.candidateID = candidateID;
+		this.voteCount = voteCount;
+	}
+
 	public int getSerialNo() {
 		return serialNo;
 	}

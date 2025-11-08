@@ -5,6 +5,12 @@ public class EOBean {
     
 	private String constituency;
 
+	public EOBean(String electoralOfficerID, String constituency) {
+		super();
+		this.electoralOfficerID = electoralOfficerID;
+		this.constituency = constituency;
+	}
+
 	public String getElectoralOfficerID() {
 		return electoralOfficerID;
 	}

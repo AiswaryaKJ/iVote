@@ -224,9 +224,38 @@ public class Admdao implements Administrator {
 	}
 	@Override
 	public ArrayList<CandidateBean> viewCandidateDetailsByParty(String partyId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		 ArrayList<CandidateBean> candidates = new ArrayList<>();
+
+		    try {
+		         PreparedStatement ps = con.prepareStatement(
+		             "SELECT c.* FROM evs_tbl_candidate c " +
+		             "JOIN evs_tbl_election e ON c.ElectionID = e.ElectionID " +
+		             "WHERE e.Name = ?");
+
+		        ps.setString(1, partyId);
+		        ResultSet rs = ps.executeQuery();
+
+		        while (rs.next()) {
+		            CandidateBean c = new CandidateBean();
+		            c.setCandidateID(rs.getString("CandidateID"));
+		            c.setName(rs.getString("Name"));
+		            c.setElectionID(rs.getString("ElectionID"));
+		            c.setPartyID(rs.getString("PartyID"));
+		            c.setDistrict(rs.getString("District"));
+		            c.setConstituency(rs.getString("Constituency"));
+		            c.setDateOfBirth(rs.getDate("DateOfBirth"));
+		            c.setMobileNo(rs.getString("MobileNo"));
+		            c.setAddress(rs.getString("Address"));
+		            c.setEmailID(rs.getString("EmailID"));
+		            candidates.add(c);
+		        }
+
+		    } catch (SQLException e) {
+		        System.out.println("SQL Error: " + e.getMessage());
+		    }
+
+		    return candidates;
+		}
 	@Override
 	public Map<?, ?> approveElectionResults(String electionId) {
 		// TODO Auto-generated method stub

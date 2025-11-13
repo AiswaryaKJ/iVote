@@ -177,6 +177,30 @@ if (partyId == null || partyId.trim().isEmpty() ||
                     }
                     break;
                 case 8:
+                	String partyId1 = JOptionPane.showInputDialog("Enter Party Id:");
+                    if (partyId1 == null || partyId1.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Party Id is required.");
+                        break;
+                    }
+
+                    ArrayList<CandidateBean> candidates1 = dao.viewCandidateDetailsByElectionName(partyId1);
+                    if (candidates1.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No candidates found for Party: " + partyId1);
+                    } else {
+                        StringBuilder sb3 = new StringBuilder("Candidates for Party: " + partyId1 + "\n\n");
+                        for (CandidateBean c : candidates1) {
+                            sb3.append("ID: ").append(c.getCandidateID())
+                              .append(", Name: ").append(c.getName())
+                              .append(", Party ID: ").append(c.getPartyID())
+                              .append(", District: ").append(c.getDistrict())
+                              .append(", Constituency: ").append(c.getConstituency())
+                              .append(", DOB: ").append(c.getDateOfBirth())
+                              .append(", Mobile: ").append(c.getMobileNo())
+                              .append(", Email: ").append(c.getEmailID())
+                              .append("\n");
+                        }
+                        JOptionPane.showMessageDialog(null, sb3.toString());
+                    }
                 	break;
                 case 12:
                 	JOptionPane.showMessageDialog(null, "You have been logged out.");

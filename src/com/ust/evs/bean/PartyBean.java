@@ -16,6 +16,8 @@ public class PartyBean {
 		this.leader = leader;
 		this.symbol = symbol;
 	}
+	 public PartyBean() {
+		}
 
 	 public String getPartyID() {
 		 return partyID;

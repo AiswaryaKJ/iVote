@@ -24,7 +24,7 @@ public class CandidateBean {
 	private String emailID ; 
 	     
 	public CandidateBean(String candidateID, String name, String electionID, String partyID, String district,
-			String constituency, Date dateOfBirth, String mobileNo, String address, String emailID) {
+			String constituency, Date dobStr, String mobileNo, String address, String emailID) {
 		super();
 		this.candidateID = candidateID;
 		this.name = name;
@@ -32,12 +32,13 @@ public class CandidateBean {
 		this.partyID = partyID;
 		this.district = district;
 		this.constituency = constituency;
-		this.dateOfBirth = dateOfBirth;
+		this.dateOfBirth = dobStr;
 		this.mobileNo = mobileNo;
 		this.address = address;
 		this.emailID = emailID;
 	}
-
+	public CandidateBean() {
+	}
 	public String getCandidateID() {
 		return candidateID;
 	}

@@ -9,13 +9,11 @@ public class ElectoralOfficedao implements ElectoralOfficer {
 
 	@Override
 	public String generateVoterId(String userId, String status) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ArrayList<ApplicationBean> viewAllVoterIdApplications() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

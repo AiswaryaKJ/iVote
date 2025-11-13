@@ -1,6 +1,5 @@
 package com.ust.evs.bean;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ElectionBean {
@@ -16,8 +15,6 @@ public class ElectionBean {
 	 private String constituency;   
 	     
 	 private Date countingDate;
-	 
-	 
 
 	 public ElectionBean(String electionID, String name, Date electionDate, String district, String constituency,
 			Date countingDate) {
@@ -29,13 +26,7 @@ public class ElectionBean {
 		this.constituency = constituency;
 		this.countingDate = countingDate;
 	}
-
-	
-//	 public ElectionBean(String elecID, String name2, String electionDateStr, String countingDateStr,
-//			SimpleDateFormat sdf) {
-//		// TODO Auto-generated constructor stub
-//	}
-
+	 public ElectionBean() {}
 
 	 public String getElectionID() {
 		 return electionID;

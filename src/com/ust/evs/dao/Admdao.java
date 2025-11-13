@@ -1,215 +1,235 @@
 package com.ust.evs.dao;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-
-import com.ust.evs.bean.ApplicationBean;
-import com.ust.evs.bean.CandidateBean;
-import com.ust.evs.bean.ElectionBean;
-import com.ust.evs.bean.PartyBean;
+import java.sql.*;
+import java.util.*;
+import com.ust.evs.bean.*;
 import com.ust.evs.service.Administrator;
 
 public class Admdao implements Administrator {
+    public static Connection con = getCon();
+    public static PreparedStatement ps;
+    public static ResultSet rs;
 
-    ArrayList<ElectionBean> electionArray = new ArrayList<>();
-    ArrayList<PartyBean> partyArray = new ArrayList<>();
-    ArrayList<CandidateBean> candidateArray = new ArrayList<>();
-    ArrayList<ApplicationBean> applicationArray = new ArrayList<>();
-
-    
+    public static Connection getCon() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Driver loaded successfully!");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/evs", "root", "pass@word1");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Driver not found: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
+        }
+        return null;
+    }
     @Override
-    public ArrayList<ElectionBean> addElection(ElectionBean electionBean) {
+    public String addElection(ElectionBean electionBean) {
+        int i = 0;
+        try {
+            ps = con.prepareStatement("INSERT INTO evs_tbl_election (ElectionId, Name, ElectionDate, District, Constituency, CountingDate) VALUES (?, ?, ?, ?, ?, ?)");
+            ps.setString(1, electionBean.getElectionID());
+            ps.setString(2, electionBean.getName());
+            ps.setDate(3, new java.sql.Date(electionBean.getElectionDate().getTime()));
+            ps.setString(4, electionBean.getDistrict());
+            ps.setString(5, electionBean.getConstituency());
+            ps.setDate(6, new java.sql.Date(electionBean.getCountingDate().getTime()));
+            i = ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
+        }
+        return i > 0 ? "SUCCESS" : "FAIL";
+    }
+    @Override
+    public ArrayList<ElectionBean> viewElections(){
+        ArrayList<ElectionBean> elections = new ArrayList<>();
 
         try {
-            electionArray.add(electionBean);
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM evs_tbl_election");
+             ResultSet rs = ps.executeQuery(); 
 
-            JOptionPane.showMessageDialog(null, "Election Added Successfully!");
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Failed!!");
-        }
-        return null;
-    }
-
-   
-    @Override
-    public ArrayList<ElectionBean> viewAllUpcomingElections() {
-
-        ArrayList<ElectionBean> upcoming = new ArrayList<>();
-        Date today = new Date();
-
-        for (ElectionBean e : electionArray) {
-            if (e.getElectionDate() != null && e.getElectionDate().after(today)) {
-                upcoming.add(e);
+            while (rs.next()) {
+                ElectionBean e = new ElectionBean();
+                e.setElectionID(rs.getString("ElectionId"));
+                e.setName(rs.getString("Name"));
+                e.setElectionDate(rs.getDate("ElectionDate"));
+                e.setDistrict(rs.getString("District"));
+                e.setConstituency(rs.getString("Constituency"));
+                e.setCountingDate(rs.getDate("CountingDate"));
+                elections.add(e);
             }
         }
-
-        if (upcoming.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No Upcoming Elections.");
-        } else {
-            StringBuilder sb = new StringBuilder("Upcoming Elections:\n\n");
-            for (ElectionBean e : upcoming) {
-                sb.append("ID: ").append(e.getElectionID()).append("\n");
-                sb.append("Name: ").append(e.getName()).append("\n");
-                sb.append("Date: ").append(e.getElectionDate()).append("\n");
-                sb.append("District: ").append(e.getDistrict()).append("\n");
-                sb.append("Constituency: ").append(e.getConstituency()).append("\n\n");
-            }
-            JOptionPane.showMessageDialog(null, sb.toString());
-        }
-        return upcoming;
-    }
-
-    @Override
-    public ArrayList<ElectionBean> viewElections() {
-        return electionArray;
-    }
-
-   
-    @Override
-    public String addParty(PartyBean partyBean) {
-
-        PartyBean pb = new PartyBean(null, null, null, null);
-        pb.setPartyID(JOptionPane.showInputDialog("Enter Party ID:"));
-        pb.setName(JOptionPane.showInputDialog("Enter Party Name:"));
-        pb.setLeader(JOptionPane.showInputDialog("Enter Party Leader:"));
-
-        partyArray.add(pb);
-
-        JOptionPane.showMessageDialog(null, "Party Added Successfully!");
-        return "SUCCESS";
-    }
-
-   
-    @Override
-    public ArrayList<PartyBean> viewAllParty() {
-
-        if (partyArray.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No Parties Available.");
-        } else {
-            StringBuilder sb = new StringBuilder("Party List:\n\n");
-            for (PartyBean p : partyArray) {
-                sb.append("ID: ").append(p.getPartyID()).append("\n");
-                sb.append("Name: ").append(p.getName()).append("\n");
-                sb.append("Leader: ").append(p.getLeader()).append("\n\n");
-            }
-            JOptionPane.showMessageDialog(null, sb.toString());
-        }
-        return partyArray;
-    }
-
-   
-    @Override
-    public String addCandidate(CandidateBean candidateBean) {
-
-        CandidateBean cb = new CandidateBean(null, null, null, null, null, null, null, null, null, null);
-
-        cb.setCandidateID(JOptionPane.showInputDialog("Enter Candidate ID:"));
-        cb.setName(JOptionPane.showInputDialog("Enter Candidate Name:"));
-        cb.setElectionID(JOptionPane.showInputDialog("Enter Election ID:"));
-        cb.setPartyID(JOptionPane.showInputDialog("Enter Party ID:"));
-
-        candidateArray.add(cb);
-
-        JOptionPane.showMessageDialog(null, "Candidate Added Successfully!");
-        return "SUCCESS";
-    }
-
-   
-    @Override
-    public ArrayList<CandidateBean> viewCandidateDetailsByElectionName(String electionName) {
-
-        ArrayList<CandidateBean> list = new ArrayList<>();
-
-        for (CandidateBean c : candidateArray) {
-            ElectionBean e = getElectionById(c.getElectionID());
-            if (e != null && e.getName().equalsIgnoreCase(electionName)) {
-                list.add(c);
-            }
+         catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
         }
 
-        if (list.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No Candidates Found for this Election.");
-        } else {
-            StringBuilder sb = new StringBuilder("Candidates:\n\n");
-            for (CandidateBean c : list) {
-                sb.append("ID: ").append(c.getCandidateID()).append("\n");
-                sb.append("Name: ").append(c.getName()).append("\n");
-                sb.append("Party: ").append(c.getPartyID()).append("\n\n");
-            }
-            JOptionPane.showMessageDialog(null, sb.toString());
-        }
-
-        return list;
+        return elections;
     }
 
-    private ElectionBean getElectionById(String id) {
-        for (ElectionBean e : electionArray)
-            if (e.getElectionID().equals(id))
-                return e;
-        return null;
-    }
 
-   
-    @Override
-    public ArrayList<CandidateBean> viewCandidateDetailsByParty(String partyId) {
+	@Override
+	public ArrayList<ElectionBean> viewAllUpcomingElections() {
+		ArrayList<ElectionBean> elections = new ArrayList<>();
 
-        ArrayList<CandidateBean> list = new ArrayList<>();
+        try {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM evs_tbl_election WHERE ElectionDate >= CURRENT_DATE");
+             ResultSet rs = ps.executeQuery(); 
 
-        for (CandidateBean c : candidateArray) {
-            if (c.getPartyID().equalsIgnoreCase(partyId)) {
-                list.add(c);
+            while (rs.next()) {
+                ElectionBean e = new ElectionBean();
+                e.setElectionID(rs.getString("ElectionId"));
+                e.setName(rs.getString("Name"));
+                e.setElectionDate(rs.getDate("ElectionDate"));
+                e.setDistrict(rs.getString("District"));
+                e.setConstituency(rs.getString("Constituency"));
+                e.setCountingDate(rs.getDate("CountingDate"));
+                elections.add(e);
             }
         }
-
-        if (list.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No Candidates Found for Party ID: " + partyId);
-        } else {
-            StringBuilder sb = new StringBuilder("Candidates of Party " + partyId + ":\n\n");
-            for (CandidateBean c : list) {
-                sb.append("ID: ").append(c.getCandidateID()).append("\n");
-                sb.append("Name: ").append(c.getName()).append("\n");
-                sb.append("Election ID: ").append(c.getElectionID()).append("\n\n");
-            }
-            JOptionPane.showMessageDialog(null, sb.toString());
+         catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
         }
 
-        return list;
+        return elections;
     }
+		
+	@Override
+	public String addParty(PartyBean partyBean) {
+	    int i = 0;
+	    try {
+	        ps = con.prepareStatement("INSERT INTO evs_tbl_party (PartyId, Name, Leader, Symbol) VALUES (?, ?, ?, ?)");
+	        ps.setString(1, partyBean.getPartyID());
+	        ps.setString(2, partyBean.getName());
+	        ps.setString(3, partyBean.getLeader());
+	        ps.setString(4, partyBean.getSymbol());
+	        i = ps.executeUpdate();
+	    } catch (SQLException e) {
+	        System.out.println("SQL Error: " + e.getMessage());
+	    }
+	    return i > 0 ? "SUCCESS" : "FAIL";
+	}
 
-   
-    @Override
-    public ArrayList<ApplicationBean> viewAllAdminPendingApplications() {
-        return applicationArray;
-    }
+	@Override
+	public ArrayList<PartyBean> viewAllParty() {
+		    ArrayList<PartyBean> parties = new ArrayList<>();
 
-    
-    @Override
-    public boolean forwardVoterIDRequest(String userId) {
-        JOptionPane.showMessageDialog(null, "Voter ID request forwarded for: " + userId);
-        return true;
-    }
+		    try {
+		         PreparedStatement ps = con.prepareStatement("SELECT * FROM evs_tbl_party");
+		         ResultSet rs = ps.executeQuery();
 
-   
-    @Override
-    public Map<String, Integer> approveElectionResults(String electionId) {
+		        while (rs.next()) {
+		            PartyBean party = new PartyBean();
+		            party.setPartyID(rs.getString("PartyID"));
+		            party.setName(rs.getString("Name"));
+		            party.setLeader(rs.getString("Leader"));
+		            party.setSymbol(rs.getString("Symbol"));
+		            parties.add(party);
+		        }
 
-        Map<String, Integer> results = new HashMap<>();
+		    } catch (SQLException e) {
+		        System.out.println("SQL Error: " + e.getMessage());
+		    }
 
-        for (CandidateBean c : candidateArray) {
-            if (c.getElectionID().equals(electionId)) {
-                int votes = (int)(Math.random() * 5000);  // dummy value
-                results.put(c.getName(), votes);
-            }
-        }
+		    return parties;
+		}
+	@Override
+	public String addCandidate(CandidateBean candidateBean) {
+	    int i = 0;
 
-        JOptionPane.showMessageDialog(null, "Election Results Approved for Election: " + electionId);
+	    try {
+	       
+	        PreparedStatement ps1 = con.prepareStatement("SELECT COUNT(*) FROM evs_tbl_election WHERE ElectionId = ?");
+	        ps1.setString(1, candidateBean.getElectionID());
+	        ResultSet rs1 = ps1.executeQuery();
+	        rs1.next();
+	        if (rs1.getInt(1) == 0) {
+	            return "FAIL: Election ID not found";
+	        }
 
-        return results;
-    }
+	        PreparedStatement ps2 = con.prepareStatement("SELECT COUNT(*) FROM evs_tbl_party WHERE PartyId = ?");
+	        ps2.setString(1, candidateBean.getPartyID());
+	        ResultSet rs2 = ps2.executeQuery();
+	        rs2.next();
+	        if (rs2.getInt(1) == 0) {
+	            return "FAIL: Party ID not found";
+	        }
+
+	        PreparedStatement ps = con.prepareStatement(
+	            "INSERT INTO evs_tbl_candidate (CandidateId, Name, ElectionId, PartyId, District, Constituency, DateOfBirth, MobileNo, Address, EmailId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	        );
+	        ps.setString(1, candidateBean.getCandidateID());
+	        ps.setString(2, candidateBean.getName());
+	        ps.setString(3, candidateBean.getElectionID());
+	        ps.setString(4, candidateBean.getPartyID());
+	        ps.setString(5, candidateBean.getDistrict());
+	        ps.setString(6, candidateBean.getConstituency());
+	        ps.setDate(7, new java.sql.Date(candidateBean.getDateOfBirth().getTime()));
+	        ps.setString(8, candidateBean.getMobileNo());
+	        ps.setString(9, candidateBean.getAddress());
+	        ps.setString(10, candidateBean.getEmailID());
+
+	        i = ps.executeUpdate();
+
+	    } catch (SQLException e) {
+	        System.out.println("SQL Error: " + e.getMessage());
+	        return "FAIL: SQL Error";
+	    }
+
+	    return i > 0 ? "SUCCESS" : "FAIL";
+	}
+
+	@Override
+	public ArrayList<CandidateBean> viewCandidateDetailsByElectionName(String electionName) {
+	    ArrayList<CandidateBean> candidates = new ArrayList<>();
+
+	    try {
+	         PreparedStatement ps = con.prepareStatement(
+	             "SELECT c.* FROM evs_tbl_candidate c " +
+	             "JOIN evs_tbl_election e ON c.ElectionID = e.ElectionID " +
+	             "WHERE e.Name = ?");
+
+	        ps.setString(1, electionName);
+	        ResultSet rs = ps.executeQuery();
+
+	        while (rs.next()) {
+	            CandidateBean c = new CandidateBean();
+	            c.setCandidateID(rs.getString("CandidateID"));
+	            c.setName(rs.getString("Name"));
+	            c.setElectionID(rs.getString("ElectionID"));
+	            c.setPartyID(rs.getString("PartyID"));
+	            c.setDistrict(rs.getString("District"));
+	            c.setConstituency(rs.getString("Constituency"));
+	            c.setDateOfBirth(rs.getDate("DateOfBirth"));
+	            c.setMobileNo(rs.getString("MobileNo"));
+	            c.setAddress(rs.getString("Address"));
+	            c.setEmailID(rs.getString("EmailID"));
+	            candidates.add(c);
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("SQL Error: " + e.getMessage());
+	    }
+
+	    return candidates;
+	}
+
+	@Override
+	public ArrayList<ApplicationBean> viewAllAdminPendingApplications() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public boolean forwardVoterIDRequest(String userId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public ArrayList<CandidateBean> viewCandidateDetailsByParty(String partyId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Map<?, ?> approveElectionResults(String electionId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -8,7 +8,7 @@ import com.ust.evs.bean.ElectionBean;
 import com.ust.evs.bean.PartyBean;
 
 public interface Administrator {
-	public ArrayList<ElectionBean> addElection(ElectionBean electionBean) ;
+	public String addElection(ElectionBean electionBean) ;
 	public ArrayList<ElectionBean> viewAllUpcomingElections() ; 
 	public ArrayList<ElectionBean> viewElections();
 	public String addParty(PartyBean partyBean); 

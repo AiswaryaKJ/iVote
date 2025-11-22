@@ -4,8 +4,11 @@ import javax.swing.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
+
 import com.ust.evs.bean.*;
 import com.ust.evs.dao.Admdao;
+import com.ust.evs.dao.Voterdao;
 
 public class AdminUI {
     	public static void showAdminMenu() {
@@ -36,47 +39,50 @@ public class AdminUI {
 
             switch (choice) {
             
-                case 1:
-                    String electionId = JOptionPane.showInputDialog("Enter Election ID:");
-                    String name = JOptionPane.showInputDialog("Enter Election Name:");
-                    String electionDateStr = JOptionPane.showInputDialog("Enter Election Date (yyyy-MM-dd):");
-                    String district = JOptionPane.showInputDialog("Enter District:");
-                    String constituency = JOptionPane.showInputDialog("Enter Constituency:");
-                    String countingDateStr = JOptionPane.showInputDialog("Enter Counting Date (yyyy-MM-dd):");
+            case 1:
+                String name = JOptionPane.showInputDialog("Enter Election Name:");
+                String electionDateStr = JOptionPane.showInputDialog("Enter Election Date (yyyy-MM-dd):");
+                String district = JOptionPane.showInputDialog("Enter District:");
+                String constituency = JOptionPane.showInputDialog("Enter Constituency:");
+                String countingDateStr = JOptionPane.showInputDialog("Enter Counting Date (yyyy-MM-dd):");
 
-                    Date electionDate = sdf.parse(electionDateStr);
-                    Date countingDate = sdf.parse(countingDateStr);
+                Date electionDate = sdf.parse(electionDateStr);
+                Date countingDate = sdf.parse(countingDateStr);
 
-                    ElectionBean electionBean = new ElectionBean(electionId, name, electionDate, district, constituency, countingDate);
-                    String electionResult = dao.addElection(electionBean);
-                    JOptionPane.showMessageDialog(null, "Election Add Status: " + electionResult);
-                    break;
+                // Pass null for ElectionId, DAO will generate it
+                ElectionBean electionBean = new ElectionBean(null, name, electionDate, district, constituency, countingDate);
+
+                String electionResult = dao.addElection(electionBean);
+                JOptionPane.showMessageDialog(null, "Election Add Status: " + electionResult);
+                break;
+
 
                 case 2:
-                    String partyId = JOptionPane.showInputDialog("Enter Party ID:");
                     String partyName = JOptionPane.showInputDialog("Enter Party Name:");
                     String leader = JOptionPane.showInputDialog("Enter Party Leader:");
                     String symbol = JOptionPane.showInputDialog("Enter Party Symbol:");
 
-                    PartyBean partyBean = new PartyBean(partyId,partyName,leader,symbol);
-                    partyBean.setPartyID(partyId);
+                    // Build PartyBean without PartyId (DAO will generate it)
+                    PartyBean partyBean = new PartyBean(null, partyName, leader, symbol);
                     partyBean.setName(partyName);
                     partyBean.setLeader(leader);
                     partyBean.setSymbol(symbol);
 
-if (partyId == null || partyId.trim().isEmpty() ||
-    partyName == null || partyName.trim().isEmpty() ||
-    leader == null || leader.trim().isEmpty() || symbol==null || symbol.trim().isEmpty()){
-    JOptionPane.showMessageDialog(null, "Party ID, Name, Leader, symbol are required fields.");
-    return;
-}
+                    // Validation
+                    if (partyName == null || partyName.trim().isEmpty() ||
+                        leader == null || leader.trim().isEmpty() ||
+                        symbol == null || symbol.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Name, Leader, and Symbol are required fields.");
+                        return;
+                    }
 
+                    // DAO will generate PartyId and return it
                     String partyResult = dao.addParty(partyBean);
                     JOptionPane.showMessageDialog(null, "Party Add Status: " + partyResult);
                     break;
 
+
                 case 3:
-                    String candidateId = JOptionPane.showInputDialog("Enter Candidate ID:");
                     String candidateName = JOptionPane.showInputDialog("Enter Candidate Name:");
                     String candElectionId = JOptionPane.showInputDialog("Enter Election ID:");
                     String candPartyId = JOptionPane.showInputDialog("Enter Party ID:");
@@ -89,8 +95,9 @@ if (partyId == null || partyId.trim().isEmpty() ||
 
                     Date dob = sdf.parse(dobStr);
 
-                    CandidateBean candidateBean = new CandidateBean(candidateId,candidateName,candElectionId,candPartyId,candDistrict,candConstituency,dob,mobile,address,email);
-                    candidateBean.setCandidateID(candidateId);
+                    // Pass null for CandidateId, DAO will generate it
+                    CandidateBean candidateBean = new CandidateBean(null, candidateName, candElectionId, candPartyId,
+                                                                    candDistrict, candConstituency, dob, mobile, address, email);
                     candidateBean.setName(candidateName);
                     candidateBean.setElectionID(candElectionId);
                     candidateBean.setPartyID(candPartyId);
@@ -101,9 +108,12 @@ if (partyId == null || partyId.trim().isEmpty() ||
                     candidateBean.setAddress(address);
                     candidateBean.setEmailID(email);
 
+                    // DAO will generate CandidateId and return it
                     String candidateResult = dao.addCandidate(candidateBean);
                     JOptionPane.showMessageDialog(null, "Candidate Add Status: " + candidateResult);
                     break;
+
+                   
                 case 4:
                     ArrayList<ElectionBean> allElections = dao.viewElections();
                     StringBuilder sb = new StringBuilder("All Elections:\n");
@@ -202,6 +212,88 @@ if (partyId == null || partyId.trim().isEmpty() ||
                         JOptionPane.showMessageDialog(null, sb3.toString());
                     }
                 	break;
+                case 9: // View Pending Applications
+                    ArrayList<ApplicationBean> pendingApps = dao.viewAllAdminPendingApplications();
+
+                    if (pendingApps.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "No pending applications found.");
+                    } else {
+                        StringBuilder sb11 = new StringBuilder("Pending Applications:\n\n");
+                        for (ApplicationBean app : pendingApps) {
+                            sb11.append("UserID: ").append(app.getUserID())
+                              .append(", Constituency: ").append(app.getConstituency())
+                              .append(", PassedStatus: ").append(app.getPassedStatus())
+                              .append(", ApprovedStatus: ").append(app.getApprovedStatus())
+                              .append("\n");
+                        }
+                        JOptionPane.showMessageDialog(null, sb11.toString());
+                    }
+                    break;
+                case 10: // Forward VoterID Request
+                    String userIdToForward = JOptionPane.showInputDialog("Enter User ID to forward:");
+
+                    if (userIdToForward == null || userIdToForward.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "User ID is required.");
+                        break;
+                    }
+
+                    boolean forwardResult = dao.forwardVoterIDRequest(userIdToForward);
+
+                    if (forwardResult) {
+                        JOptionPane.showMessageDialog(null, "Request forwarded to EO successfully.");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to forward request. Please check User ID.");
+                    }
+                    break;
+                case 11:
+                    // Admin approves election results and views winner(s)
+                    String electionIdAdmin = JOptionPane.showInputDialog(
+                            null,
+                            "Enter Election ID to approve results:",
+                            "Approve Election Results",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                    if (electionIdAdmin != null && !electionIdAdmin.trim().isEmpty()) {
+                        Admdao service = new Admdao();
+                        Map<String, Object> resultMap = service.approveElectionResults(electionIdAdmin);
+
+                        StringBuilder sb11 = new StringBuilder();
+                        sb11.append("Election ID: ").append(electionIdAdmin).append("\n");
+                        sb11.append("Status: ").append(resultMap.get("status")).append("\n\n");
+
+                        // Show each candidate’s votes
+                        for (Map.Entry<String, Object> entry : resultMap.entrySet()) {
+                            String key = entry.getKey();
+                            if (!key.equals("status") && !key.equals("winner") && !key.equals("winnerVotes")) {
+                                sb11.append("Candidate ").append(key)
+                                  .append(" → Votes: ").append(entry.getValue()).append("\n");
+                            }
+                        }
+
+                        // Show winner(s)
+                        Object winners = resultMap.get("winner");
+                        Object winnerVotes = resultMap.get("winnerVotes");
+                        if (winners != null) {
+                            sb11.append("\nWinner(s): ").append(winners)
+                              .append(" with ").append(winnerVotes).append(" votes");
+                        }
+
+                        JOptionPane.showMessageDialog(
+                                null,
+                                sb11.toString(),
+                                "Approved Election Results",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Election ID is required!",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                    break;
+
                 case 12:
                 	JOptionPane.showMessageDialog(null, "You have been logged out.");
                     return;

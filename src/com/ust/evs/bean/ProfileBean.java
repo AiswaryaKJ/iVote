@@ -28,13 +28,21 @@ public class ProfileBean {
         
     private String emailID  ;  
     
-    private String password; 
-        
-    public ProfileBean(String userID, String firstName, String lastName, Date dateOfBirth, String gender, String street,
+    private String password;
+    
+    private String constituency;
+    public String getConstituency() {
+		return constituency;
+	}
+	public void setConstituency(String constituency) {
+		this.constituency = constituency;
+	}
+	public ProfileBean() {}
+    public ProfileBean(String firstName, String lastName, Date dateOfBirth, String gender, String street,
 			String location, String city, String state, String pincode, String mobileNo, String emailID,
-			String password) {
+			String password,String constituency) {
 		super();
-		this.userID = userID;
+		
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.dateOfBirth = dateOfBirth;
@@ -47,6 +55,7 @@ public class ProfileBean {
 		this.mobileNo = mobileNo;
 		this.emailID = emailID;
 		this.password = password;
+		this.constituency=constituency;
 	}
 
 	public String getUserID() {

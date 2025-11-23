@@ -116,13 +116,8 @@ cd iVote
 🔐 Security Features
 
 PreparedStatements → Prevent SQL Injection
-
 Encrypted login workflow
-
 Role-based access control
-
 Login status tracking
-
 Unique auto-generated IDs
-
 Duplicate vote prevention
